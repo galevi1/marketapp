@@ -18,6 +18,8 @@ app.use(bodyParser.json());
 app.set('view engine', 'ejs');// צד שמאל באיזה מנוע אנחנו רוצים להשתמש ובצד ימין איזה תיקייה או ספריה
 app.set('views','views');
 
+
+
 //MULTER - PATH - UPLOAD FILES
 //1
 const fileStorage = multer.diskStorage({
@@ -27,19 +29,41 @@ const fileStorage = multer.diskStorage({
     filename:(request, file, callback) => {
         callback(null, file.originalname);
     }
-})
-//2
+});
+
+
 app.use(multer({ storage: fileStorage, limits: {fieldSize: 25033697} }).array('image'));//קובע חוק באתר שכל השדות של התמונות יהיו אימג
 app.use(express.static(path.join(__dirname, 'public'))); //איזה תיקייה היא התיקייה הציבורית שפתוחה לתמונות ולמה שצריף
 app.use('/images', express.static('images'));
 
-
-const indexController = require('./controllers/index');
-const { runInNewContext } = require('vm');
-app.use('/', indexController);
-
 //1 תיצור לי איזשהי הגנה
 const csurfProtection = csrf();
+
+const mongo_uri = 'mongodb+srv://EasyFit:easyfit2021@cluster0.duxcj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const store = new MongoDBStore({
+    uri: mongo_uri,
+    collection: 'session'
+})
+
+app.use(session({
+    secret: 'd7zoqLsQWdIHkWrt9F1KLRaMTIHg41at',
+    resave: false,
+    saveUninitialized: false,
+    store: store
+}))
+
+app.use((request, response, next) => {
+    if(!request.session.ccount){
+        return next();
+    }
+    account.findById(request.session.account._id)
+    .then(account => {
+        request.account = account;
+        next();
+    })
+    .catch(error => console.log(error));
+})
+
 //2 תגני כל הזמן
 app.use(csurfProtection);
 //3 מסבירה לו איך להשתמש 
@@ -47,10 +71,29 @@ app.use((request, response, next) => {
     response.locals.csrfToken = request.csrfToken();
     next();
 });
+//2
 
+
+
+const indexController = require('./controllers/index');
+const { runInNewContext } = require('vm');
+app.use('/', indexController);
+
+
+const actionsController = require('./controllers/actions');
+app.use('/actions', actionsController);
+
+const dashboardController = require('./controllers/dashboard');
+app.use('/dashboard', dashboardController);
 
 const port = 6060;
-app.listen(port, function(){
-    console.log(`server is running via ${port}`);
-});
+
+mongoose.connect(mongo_uri, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false})
+.then(database_connect_results => {
+    console.log(database_connect_results);
+    app.listen(port, function(){
+        console.log(`Server is running via ${port}`);
+    });
+})
+.catch(error => console.log(error))
 

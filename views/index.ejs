@@ -10,15 +10,25 @@
 <body>
     <div class = "container">
         <div class ="row">
-            <div class = "col-lg-3">1</div>
-                <h4>Upload files</h4>
-                <p>Here you can upload any file you loke to the nodeJS server</p><br/>
-                <form method="POST" action="/uploadfile" enctype="multipart/form-data" id="upload_form">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken%>" />
-                    <input type="file" multiple name="image" class="form-control" />
+            <div class = "col-lg-4"></div>
+            <div class = "col-lg-4">
+                <h4> Register</h4>
+                <form id="register_form" action="/actions/register" method="POST" >
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />   
+                    <input placeholder="Full name" type="text" name="fullname" class="form-controller" style="margin-top:10xp"/>
+                    <input placeholder="Email" type="email" name="email" class="form-controller" style="margin-top:10xp"/>
+                    <input placeholder="Password" type="password" name="password" class="form-controller" style="margin-top:10xp"/>
+                    <input type="submit" form="register_form" value="Register" class="btn btn-primary" style="margin-top:10xp"/>
                 </form>
-                <input style="margin-top: 10px;" type="submit" value="Upload File" class="btn btn-primary" form="upload_form" />
-            <div class = "col-lg-9">2</div>
+            </br></br>
+            <h4> Login</h4>
+            <form id="login_form" action="/actions/login" method="POST" >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />   
+                <input placeholder="Email" type="email" name="email" class="form-controller" style="margin-top:10xp"/>
+                <input placeholder="Password" type="password" name="password" class="form-controller" style="margin-top:10xp"/>
+                <input type="submit" form="login_form" value="login" class="btn btn-success" style="margin-top:10xp"/>
+            </form>
+            </div>
         </div>
     </div>
 </body>
